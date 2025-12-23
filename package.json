@@ -1,22 +1,38 @@
 {
   "name": "mu-vue-utils",
   "version": "1.1.0",
+  "type": "module",
   "description": "",
-  "main": "index.js",
+  "module": "./dist/index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "pnpm run clean && tsc -p tsconfig.json --module nodenext --outDir dist",
+    "watch": "pnpm run clean && tsc -w -p tsconfig.json --module nodenext --outDir dist",
+    "clean": "rm -rf dist"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.22.0",
   "exports": {
-    "./components/": "./src/components/",
-    "./utils/": "./src/utils/"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
   },
   "dependencies": {
     "mu-js-utils": "^1.16.0",
     "vue": "^3.5.24",
     "vue-router": "^4.6.3"
-  }
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "files": [
+    "dist"
+  ]
 }
