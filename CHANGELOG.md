@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-01-30
+
+- **ID Generator Composable** (`useIdGen`) - Generate unique component-based IDs
+  - It is possible to pass `ref` to an HTML element.
+  - Configurable prefix options for compound and generated IDs
+- **URL Mirror Composable** (`useUrlMirror`) - Keep reactive variables synchronized with URL query parameters
+  - Support for route parameters using `@` prefix (e.g., `@:userId`)
+
 ## [1.2.0] - 2025-12-02
 
 ### Added
@@ -16,8 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `add()` - Link one or more refs to query parameters with custom serialization
   - `create()` - Create a single ref linked to a query parameter
   - `createObject()` - Create a reactive object with properties synchronized to query parameters
+    - Support for per-property patch method callbacks
   - Support for multiple serialization formats: String, Number, Integer, Float, Boolean, JSON
 - **ID Generator Composable** (`useIdGen`) - Generate unique component-based IDs
+  - Automatic UUID fallback when Vue instance unavailable
+  - Auto-ID assignment for element refs
 - **Flash Messaging System** (`flash`, `Flash`)
   - `Flash` class with message buffering and callback registration
   - Customizable CSS classes for messages and containers

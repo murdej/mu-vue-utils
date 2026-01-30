@@ -52,6 +52,8 @@ Generated IDs follow the format: `{componentUid}_{name}`
 
 ### Form Inputs with Labels
 
+#### Basic usage:
+
 ```vue
 <template>
   <div>
@@ -67,6 +69,45 @@ const idGen = useIdGen();
 
 const email = ref('');
 </script>
+```
+
+#### Dynamic ids:
+
+```vue
+<script setup>
+  import { useIdGen } from 'mu-vue-utils';
+  const idGen = useIdGen();
+</script>
+
+<template>
+  <div v-for="item of items">
+    <input type="checkbox" :id="idGen('item_' + item.id)" />
+    <label :for="idGen('item_' + item.id)">{{ item.name }}</label>
+  </div>
+</template>
+```
+
+#### Use with attribut `ref`.
+
+If the element has the `id` attribute, its value is used. If not, the id is generated.
+
+**Warning:** If the ID is reactive, it will not function correctly.
+
+```vue
+<script setup>
+  import { useIdGen } from 'mu-vue-utils';
+  const idGen = useIdGen();
+  const input1 = ref(null);
+  const input2 = ref(null);
+</script>
+
+<template>
+    <label :for="idGen(input1)">Email - ref, no id</label>
+    <input ref="input1" v-model="data.email1" type="email"/>
+    <hr />
+    <label :for="idGen(input2)">Email - ref, static id</label>
+    <input ref="input2" id="id-input2" v-model="data.email2" type="email"/>
+</template>
 ```
 
 ### Accessibility (aria-labelledby)
@@ -86,54 +127,6 @@ import { useIdGen } from 'mu-vue-utils';
 
 const idGen = useIdGen();
 const headingId = idGen('settings-heading');
-</script>
-```
-
-### Tabs Component
-
-```vue
-<template>
-  <div>
-    <div role="tablist">
-      <button
-        v-for="(tab, index) in tabs"
-        :key="index"
-        :id="getTabId(index)"
-        :aria-controls="getTabPanelId(index)"
-        :aria-selected="activeTab === index"
-        role="tab"
-        @click="activeTab = index"
-      >
-        {{ tab.title }}
-      </button>
-    </div>
-
-    <div
-      v-for="(tab, index) in tabs"
-      :key="index"
-      :id="getTabPanelId(index)"
-      :aria-labelledby="getTabId(index)"
-      role="tabpanel"
-      v-show="activeTab === index"
-    >
-      <slot :name="`tab-${index}`" />
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { useIdGen } from 'mu-vue-utils';
-import { ref } from 'vue';
-
-defineProps({
-  tabs: Array
-});
-
-const idGen = useIdGen();
-const activeTab = ref(0);
-
-const getTabId = (index) => idGen(`tab-${index}`);
-const getTabPanelId = (index) => idGen(`panel-${index}`);
 </script>
 ```
 

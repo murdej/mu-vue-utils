@@ -62,6 +62,7 @@ export function useUrlMirror(
 class UrlMirror {
     private router: Router|null;
     private route: any|null;
+    public paramPrefix = '@';
 
     /**
      * Adds one or more reactive references to mirror a query parameter in the URL.
@@ -93,14 +94,16 @@ class UrlMirror {
                 : Object.entries(queryParam)
         ) as unknown as [string, Ref][];
 
-        for (const [currentQueryParam, currentVariable] of items) {
+        for (let [propName, currentVariable] of items) {
+            const field = propName.startsWith(this.paramPrefix) ? 'param' : 'query';
+            const urlPropName = field === 'param' ? propName.substring(this.paramPrefix.length) : propName;
             (()=>{
                 // The last value read from the URL to prevent unnecessary history patches when reading
-                let lastUrlValue = ru.route.query[currentQueryParam];
+                let lastUrlValue = ru.route[field][urlPropName];
 
                 // Watch for changes in the URL and update the reactive variable
                 watch(
-                    () => ru.route.query[currentQueryParam],
+                    () => ru.route[field][urlPropName],
                     (newUrlValue) => {
                         // Check if a real change occurred in the URL and that it wasn't the last value we wrote
                         if (newUrlValue !== lastUrlValue) {
@@ -122,13 +125,19 @@ class UrlMirror {
                         lastUrlValue = urlValue; // Store the value we are writing
 
                         // Apply change to the URL
-                        const newQuery = {[currentQueryParam]: urlValue};
+                        const newQuery = {[urlPropName]: urlValue};
                         switch (patchMethod) {
                             case 'replace':
-                                ru.patchRouteR(newQuery);
+                                ru.patchRouteR(
+                                    field === 'query' ? newQuery : {},
+                                    field === 'param' ? newQuery : {},
+                                );
                                 break;
                             case 'push':
-                                ru.patchRouteP(newQuery);
+                                ru.patchRouteP(
+                                    field === 'query' ? newQuery : {},
+                                    field === 'param' ? newQuery : {},
+                                );
                                 break;
                         }
                     },
@@ -136,16 +145,19 @@ class UrlMirror {
                 );
 
                 // Initial synchronization: URL to variable
-                if (typeof ru.route.query[currentQueryParam] !== 'undefined') {
+                if (typeof ru.route[field][urlPropName] !== 'undefined') {
                     currentVariable.value = deserializer
-                        ? deserializer(ru.route.query[currentQueryParam])
-                        : ru.route.query[currentQueryParam];
+                        ? deserializer(ru.route[field][urlPropName])
+                        : ru.route[field][urlPropName];
                 } else {
                     // Initial synchronization: variable to URL, if not defined in URL
                     const urlValue = serializer
                         ? serializer(currentVariable.value)
                         : currentVariable.value;
-                    if (urlValue !== ru.route.query[currentQueryParam]) ru.patchRouteR({[currentQueryParam]: urlValue});
+                    if (urlValue !== ru.route[field][urlPropName]) ru.patchRouteR(
+                        field === 'query' ? {[propName]: urlValue} : {},
+                        field === 'param' ? {[propName]: urlValue} : {},
+                    );
                 }
             })();
         }
@@ -238,7 +250,7 @@ class UrlMirror {
      */
     public createObject<TDef extends ObjectDef>(
         definitions: TDef,
-        patchMethod: 'replace' | 'push' | ((name: string, value: any) => 'replace' | 'push') = 'replace',
+        patchMethod: 'replace' | 'push' | ((name: keyof TDef, value: any) => 'replace' | 'push') = 'replace',
     ): MappedObjectDef<TDef> {
         // Create an empty reactive object that will serve as the mirror
         const reactiveObject = reactive({}) as MappedObjectDef<TDef>;
@@ -250,6 +262,8 @@ class UrlMirror {
         // Iterate over all defined properties of the object
         for (const [propName, propDef] of Object.entries(definitions)) {
             // Get the specific serialization and deserialization functions for the property
+            const field = propName.startsWith(this.paramPrefix) ? 'param' : 'query';
+            const urlPropName = field === 'param' ? propName.substring(this.paramPrefix.length) : propName;
             const { serializer, deserializer } = this.prepareDSCallbacks(propDef);
 
             // Set the initial value in the reactive object (deserializer handles null/undefined)
@@ -257,7 +271,7 @@ class UrlMirror {
 
             // 1. Watch for changes in the URL and update the reactive object
             watch(
-                () => ru.route.query[propName],
+                () => ru.route[field][urlPropName],
                 (newUrlValue) => {
                     // Check if the URL value is different from the last value we wrote
                     if (newUrlValue !== lastUrlValues[propName]) {
@@ -277,7 +291,7 @@ class UrlMirror {
                     lastUrlValues[propName] = urlValue; // Store the value we are writing
 
                     // Update the URL
-                    const newQuery = {[propName]: urlValue};
+                    const newQuery = {[urlPropName]: urlValue};
 
                     const currentPatchMethod = (typeof patchMethod === 'function')
                         ? patchMethod(propName, newPropValue)
@@ -285,10 +299,16 @@ class UrlMirror {
 
                     switch (currentPatchMethod) {
                         case 'replace':
-                            ru.patchRouteR(newQuery);
+                            ru.patchRouteR(
+                                field === 'query' ? newQuery : {},
+                                field === 'param' ? newQuery : {},
+                            );
                             break;
                         case 'push':
-                            ru.patchRouteP(newQuery);
+                            ru.patchRouteP(
+                                field === 'query' ? newQuery : {},
+                                field === 'param' ? newQuery : {},
+                            );
                             break;
                     }
                 },
@@ -296,7 +316,7 @@ class UrlMirror {
             );
 
             // 3. Initial synchronization
-            const urlQueryValue = ru.route.query[propName];
+            const urlQueryValue = ru.route[field][urlPropName];
 
             if (typeof urlQueryValue !== 'undefined' && urlQueryValue !== null) {
                 // Initial value from URL: Deserialize and set to the object
@@ -310,7 +330,10 @@ class UrlMirror {
 
                 // Update URL only if the serialized value is not null
                 if (urlValue !== null) {
-                    ru.patchRouteR({[propName]: urlValue});
+                    ru.patchRouteR(
+                        field === 'query' ? { [urlPropName]: urlValue} : {},
+                        field === 'param' ? { [urlPropName]: urlValue} : {},
+                    );
                     lastUrlValues[propName] = urlValue;
                 }
             }
