@@ -7,6 +7,15 @@ export function useRouterUtil(router: Router = null, route = null): RouterUtil
     );
 }
 
+const symbolKeepList = Symbol();
+
+type PatchFields = {
+    [symbolKeepList]?: string[],
+    [other: string]: UrlValue,
+};
+
+type UrlValue = string|number|null;
+
 /**
  * Utility class to simplify route parameter manipulation.
  *
@@ -35,27 +44,47 @@ export class RouterUtil {
      * @param {string|null} [name=null] - The new route name. If `null`, the current route name is preserved.
      * @returns {any} A new route location object ready to be passed to `router.push()` or `router.replace()`.
      */
-    public patchUrl(query: Record<string, number|string|null>|false, params: Record<string, number|string|null>|false = {}, name: string|null = null) {
-        // console.log(query, params, name);
+    public patchUrl(
+        query: PatchFields|false,
+        params: PatchFields|false = {},
+        name: string|null = null
+    ) {
         const r  = {
             ...this.route,
             name: name ?? this.route.name,
-            query: query !== false
-                ? {
-                    ...this.route.query,
-                    ...query,
-                }
-                : {},
-            params: params !== false
-                ? {
-                    ...this.route.params,
-                    ...params,
-                }
-                : {},
+            query: this.getParams(this.route.query, query),
+            params: this.getParams(this.route.params, params),
         };
-        // console.log(r);
 
         return r;
+    }
+
+    protected getParams(src: Record<string,string>, newValues: PatchFields|false): Record<string,UrlValue>
+    {
+        if (newValues === false) {
+            return {};
+        } else if (symbolKeepList in newValues) {
+            const { [symbolKeepList]: fields, ...res } = newValues;
+            for (const field of fields) {
+                if (field in src) res[field] = src[field];
+            }
+            return res;
+        } else {
+            return {
+                ...src,
+                ...newValues,
+            }
+        }
+    }
+
+    protected getFields(src: Record<string,string>, fields: string[]): Record<string,string>
+    {
+        const res = {};
+        for (const field of fields) {
+            if (field in src)
+                res[field] = src[field];
+        }
+        return res;
     }
 
     public patchRouteR(query: Record<string, number|string|null>, params: Record<string, number|string|null> = {}) {
@@ -64,5 +93,12 @@ export class RouterUtil {
 
     public patchRouteP(query: Record<string, number|string|null>, params: Record<string, number|string|null> = {}) {
         this.router.push(this.patchUrl(query, params));
+    }
+
+    public keep(...fields: string[]): PatchFields
+    {
+        return {
+            [symbolKeepList]: fields
+        };
     }
 }

@@ -2,6 +2,10 @@
 
 The `useIdGen` composable generates unique IDs scoped to each component instance. This is useful for creating unique identifiers for form elements, accessibility attributes, and other DOM-related purposes.
 
+A key is entered as a parameter of the idGen function. A unique ID is generated based on this key. If the same key is used in the same instance, the same ID is always generated. If the same key is used in another component or another instance of the component, the generated ID will be different.
+
+This ensures the uniqueness of the ID and simplicity of use (no need to use auxiliary variables).
+
 ## Basic Usage
 
 ```vue
@@ -40,13 +44,6 @@ import { useIdGen } from 'mu-vue-utils';
 const idGen = useIdGen();
 const id = idGen('input');  // Returns something like "42_input"
 ```
-
-### ID Format
-
-Generated IDs follow the format: `{componentUid}_{name}`
-
-- `componentUid` - Unique identifier for the component instance (from Vue's internal `uid`)
-- `name` - The name you provided
 
 ## Common Patterns
 
@@ -87,7 +84,7 @@ const email = ref('');
 </template>
 ```
 
-#### Use with attribut `ref`.
+#### Use with attribute `ref`.
 
 If the element has the `id` attribute, its value is used. If not, the id is generated.
 

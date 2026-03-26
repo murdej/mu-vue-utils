@@ -7,7 +7,8 @@
   "scripts": {
     "build": "pnpm run clean && tsc -p tsconfig.json --module nodenext --outDir dist",
     "watch": "pnpm run clean && tsc -w -p tsconfig.json --module nodenext --outDir dist",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [],
   "author": "",
@@ -29,8 +30,13 @@
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/node": "^20.0.0"
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
+    "@vue/test-utils": "^2.4.6",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.0.0"
   },
   "files": [
     "dist"
