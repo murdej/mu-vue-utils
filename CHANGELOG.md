@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-03-26
+
+### Added
+- **Jest test suite** - Unit testing infrastructure with TypeScript and ESM support
+  - `jest`, `ts-jest`, `@vue/test-utils` configured for Vue 3 + TypeScript + ESM
+  - `jest.config.ts` with pnpm virtual store compatibility
+  - `tsconfig.test.json` for test-specific TypeScript settings
+  - Tests for `RouterUtil`: `patchUrl()`, `keep()`, `patchRouteP()`, `patchRouteR()`
+  - Tests for `useIdGen`: compound ID generation, uniqueness
+
 ## [1.3.0] - 2026-01-30
 
 - **ID Generator Composable** (`useIdGen`) - Generate unique component-based IDs

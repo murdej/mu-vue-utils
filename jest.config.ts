@@ -10,12 +10,17 @@ const config: Config = {
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
       useESM: true,
-      tsconfig: {
-        module: 'ESNext',
-        moduleResolution: 'Bundler',
-      },
+      tsconfig: './tsconfig.test.json',
+      diagnostics: false,
+    }],
+    '^.+\\.m?js$': ['ts-jest', {
+      useESM: true,
+      diagnostics: false,
     }],
   },
+  transformIgnorePatterns: [
+    '/node_modules/.pnpm/(?!(vue|@vue|vue-router|@vue\\+test-utils)@)',
+  ],
 };
 
 export default config;
