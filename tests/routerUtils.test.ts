@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { isRef, reactive } from 'vue';
 import { RouterUtil } from '../src/Composables/routerUtils.js';
 
 function makeRoute(query: Record<string, string> = {}, params: Record<string, string> = {}, name = 'testRoute') {

@@ -12,7 +12,7 @@ export function useIdGen(options: Partial<UseIdGenOptions> = {}) {
         options.instanceUid = instance?.uid.toString() ?? Math.random().toString(36).slice(2, 9);
     }
 
-    return (target: string | Ref<HTMLElement | null>): string|ComputedRef<string> => {
+    return (target: string | Ref<HTMLElement | null>): string|ComputedRef<string>|Promise<string> => {
         if (typeof target === 'string') {
             return `${options.prefixCompound}${options.instanceUid}_${target}`;
         }
@@ -22,9 +22,11 @@ export function useIdGen(options: Partial<UseIdGenOptions> = {}) {
                 return target.id;
                 if ((target as any).__vnode?.dynamicProps.includes('id')) {
                     return (async () => {
-                        nextTick();
+                        await nextTick();
+                        //@ts-ignore
                         return target.id;
                     })();
+                    //@ts-ignore
                 } else return target.id;
             }
 

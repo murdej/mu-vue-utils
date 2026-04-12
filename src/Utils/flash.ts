@@ -1,3 +1,15 @@
+import {VisualParamDef} from "./VisualParam.js";
+
+export type FlashVisuals = "containerClass" | "messageClass" | "messageTypePrefix" | "timerClass" | "closeBtnClass";
+
+export const defaultFlashVisuals: VisualParamDef<FlashVisuals> = {
+    containerClass: ['flash-container'],
+    messageClass: ['alert'],
+    messageTypePrefix: 'alert-',
+    timerClass: 'flash-close-timer',
+    closeBtnClass: 'btn-close',
+};
+
 export class Flash {
     private addCallback: (type: FlashMessageType, message: string) => void;
 
@@ -21,14 +33,6 @@ export class Flash {
             this.buffer.push([type, message]);
         }
     }
-
-    public messageCssClasses: ((type: string, isTimeout: boolean)=>void) = (type, isTimeout) => [
-        'alert',
-        'alert-' + (this.typeAlias[type] ?? type),
-        isTimeout ? 'flash-close-timer' : null
-    ];
-
-    public containerCssClasses: (()=>string[]|Record<string,boolean>) = () => [ 'flash-container' ];
 }
 
 export type FlashMessageType = 'info'|'error'|string;

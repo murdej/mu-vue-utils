@@ -1,6 +1,6 @@
 import {reactive, Ref, ref, watch} from "vue";
 import {useRouterUtil} from "./routerUtils.js";
-import {Router} from "vue-router";
+import {Router, useRoute, useRouter} from "vue-router";
 
 /**
  * Definition for custom serializer/deserializer pair.
@@ -56,7 +56,10 @@ export function useUrlMirror(
     route: any|null = null,
 ): UrlMirror
 {
-    return new UrlMirror(router, route);
+    return new UrlMirror(
+        router ?? useRouter(),
+        route ?? useRoute(),
+    );
 }
 
 class UrlMirror {

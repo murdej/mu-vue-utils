@@ -14,7 +14,7 @@ type PatchFields = {
     [other: string]: UrlValue,
 };
 
-type UrlValue = string|number|null;
+export type UrlValue = string|number|null;
 
 /**
  * Utility class to simplify route parameter manipulation.

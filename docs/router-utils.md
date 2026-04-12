@@ -68,6 +68,25 @@ const cleanRoute = util.patchUrl(false, {});
 // Result: { name: 'current-route', query: {}, params: { ...currentParams } }
 ```
 
+### `RouterUtil.keep(...fields)`
+
+Builds a patch object that retains only the specified fields from the current query or params, discarding all others. Intended to be passed as the `query` or `params` argument to `patchUrl()`, `patchRouteP()`, or `patchRouteR()`.
+
+**Parameters:**
+- `...fields` (string[]) - Names of fields to keep from the current route
+
+**Returns:** `PatchFields` patch object
+
+**Example:**
+```typescript
+const util = useRouterUtil();
+
+// Current URL: /search?q=vue&page=3&sort=name
+// Keep only 'q', drop 'page' and 'sort'
+util.patchRouteP(util.keep('q'));
+// Result URL: /search?q=vue
+```
+
 ### `RouterUtil.patchRouteP(query, params?)`
 
 Navigate to a patched route using `router.push()` (adds to history).
@@ -152,6 +171,17 @@ const navigateToUser = (userId) => {
   util.patchRouteP({}, { id: userId });
 };
 </script>
+```
+
+### Resetting filters while preserving search term
+
+```typescript
+const util = useRouterUtil();
+
+// Current URL: /search?q=vue&page=3&sort=name&filter=active
+// Reset to page 1 and keep only the search term
+util.patchRouteR({ ...util.keep('q'), page: 1 });
+// Result URL: /search?q=vue&page=1
 ```
 
 ## Notes
