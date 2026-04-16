@@ -1,6 +1,14 @@
 import {VisualParamDef} from "./VisualParam.js";
+import type {Component, ConcreteComponent} from 'vue';
 
 export type FlashVisuals = "containerClass" | "messageClass" | "messageTypePrefix" | "timerClass" | "closeBtnClass";
+
+export type FlashContent = string
+    | { html: string }
+    | {
+        component: Component | ConcreteComponent;
+        componentProps?: Record<string, any>;
+    };
 
 export const defaultFlashVisuals: VisualParamDef<FlashVisuals> = {
     containerClass: ['flash-container'],
@@ -11,7 +19,7 @@ export const defaultFlashVisuals: VisualParamDef<FlashVisuals> = {
 };
 
 export class Flash {
-    private addCallback: (type: FlashMessageType, message: string) => void;
+    private addCallback: (type: FlashMessageType, message: FlashContent) => void;
 
     public typeAlias: Record<FlashMessageType, string> = {
         info: 'primary',
@@ -26,7 +34,7 @@ export class Flash {
     }
 
     private buffer = [];
-    public add(type: FlashMessageType, message: string) {
+    public add(type: FlashMessageType, message: FlashContent) {
         if (this.addCallback) {
             this.addCallback(type, message);
         } else {

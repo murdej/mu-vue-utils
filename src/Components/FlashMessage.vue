@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import {flash, FlashVisuals, defaultFlashVisuals} from "../Utils/flash.js";
+import {flash, FlashVisuals, defaultFlashVisuals, type FlashContent} from "../Utils/flash.js";
 import {VisualParam, VisualParamDef} from "../Utils/VisualParam.js";
 import {Timer} from "mu-js-utils/lib/Timer.js";
 
 const props = defineProps<{
-	message: string;
+	message: FlashContent;
 	type?: string;
 	id: number;
 	visuals?: VisualParamDef<FlashVisuals>;
@@ -36,11 +36,20 @@ const stopTimer = () => {
 	timer.stop();
 	timeout.value = null;
 }
+const messageType = computed(() => {
+  if (typeof props.message === 'string') return 'text';
+  else if (props.message.html) return 'html';
+  else return 'component';
+});
 </script>
 
 <template>
 <div :class="cssClasses" @click="stopTimer" :style="{'--flash-close-timeout': timeout + 'ms'}">
-	{{ message }}
+  <template v-if="messageType === 'text'">
+	  {{ message }}
+  </template>
+  <template  v-if="messageType === 'html'" v-html="message.html" />
+  <component v-if="messageType === 'component'" :is="props.message.component" v-bind="props.message.componentProps" />
 	<button type="button" :class="vis.closeBtnClass" @click="$emit('remove', props.id)" aria-label="Close"></button>
 </div>
 </template>

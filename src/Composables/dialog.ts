@@ -4,12 +4,15 @@ import {VisualParamDef} from "../Utils/VisualParam.js";
 const dialogs = ref<DialogApi[]>([]);
 let lastDialogId: number = 1;
 
-export type DialogVisuals = "containerClass"|"buttonClass"|"messageClass"|"buttonContainerClass"|"dialogClass";
-const defaultVisual: VisualParamDef<DialogVisuals> = {
+export type DialogVisuals = "containerClass"|"buttonClass"|"messageClass"|"buttonContainerClass"|"dialogClass"|"closeButtonClass"|"closeButtonLabel"|"closeButtonLabelHtml";
+export const dialogDefaultVisual: VisualParamDef<DialogVisuals> = {
     buttonClass: null,
     messageClass:  ['dialog-message'],
     buttonContainerClass: ['dialog-buttons'],
     dialogClass: null,
+    closeButtonClass: ['dialog-close'],
+    closeButtonLabel: '×',
+    closeButtonLabelHtml: null,
 };
 
 export type DialogContainerData = {
@@ -58,6 +61,7 @@ export class DialogApi {
     public id: number;
     private resolve: (value: any) => void;
     private cancelValue = null;
+    public closeValue: any = null;
     constructor(
         public message: string,
         public buttons: ButtonDef[],
@@ -77,6 +81,11 @@ export class DialogApi {
 
     public onCancel() {
         this.resolve(this.cancelValue);
+        this.remove();
+    }
+
+    public onClose() {
+        this.resolve(this.closeValue);
         this.remove();
     }
 

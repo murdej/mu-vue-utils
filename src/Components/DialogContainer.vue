@@ -9,8 +9,6 @@ const props = defineProps<{
 }>();
 
 const { dialogContainerData } = useDialog();
-console.log(props.dialogContainerData.dialogs);
-console.log(dialogContainerData.dialogs);
 </script>
 
 <template>
