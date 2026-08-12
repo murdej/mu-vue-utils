@@ -5,9 +5,10 @@
   "description": "",
   "module": "./dist/index.mjs",
   "scripts": {
-    "build": "pnpm run clean && tsc -p tsconfig.json --outDir dist",
-    "watch": "pnpm run clean && tsc -w -p tsconfig.json --outDir dist",
+    "build": "pnpm run clean && tsc -p tsconfig.json --outDir dist && pnpm run copy:components",
+    "watch": "pnpm run clean && pnpm run copy:components && tsc -w -p tsconfig.json --outDir dist",
     "clean": "rm -rf dist",
+    "copy:components": "cp -r src/Components dist/Components",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [],
@@ -19,6 +20,7 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs"
     },
+    "./Components/*": "./dist/Components/*",
     "./*": {
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js"
