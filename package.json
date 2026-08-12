@@ -1,12 +1,12 @@
 {
   "name": "mu-vue-utils",
-  "version": "1.3.0",
+  "version": "1.5.0",
   "type": "module",
   "description": "",
   "module": "./dist/index.mjs",
   "scripts": {
-    "build": "pnpm run clean && tsc -p tsconfig.json --module nodenext --outDir dist",
-    "watch": "pnpm run clean && tsc -w -p tsconfig.json --module nodenext --outDir dist",
+    "build": "pnpm run clean && tsc -p tsconfig.json --outDir dist",
+    "watch": "pnpm run clean && tsc -w -p tsconfig.json --outDir dist",
     "clean": "rm -rf dist",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },

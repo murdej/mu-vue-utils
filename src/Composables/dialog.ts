@@ -1,5 +1,6 @@
 import { type Ref, ref} from 'vue';
-import {VisualParamDef} from "../Utils/VisualParam.js";
+import {VisualParamDef} from "../Utils/VisualParam";
+import {ElementContent} from "../Utils/types.js";
 
 const dialogs = ref<DialogApi[]>([]);
 let lastDialogId: number = 1;
@@ -25,7 +26,7 @@ export const useDialog = () => {
         dialogs,
     };
     const addDialog = (
-        message: string,
+        message: ElementContent,
         buttons: ButtonDef[],
         visuals: VisualParamDef<DialogVisuals> = {},
     ) => {
@@ -51,8 +52,7 @@ const remove = (dialog: DialogApi) => {
 }
 
 export type ButtonDef = {
-    label?: string;
-    labelHtml?: string;
+    label?: ElementContent;
     value: any;
     cssClass?: string;
 }
@@ -63,7 +63,7 @@ export class DialogApi {
     private cancelValue = null;
     public closeValue: any = null;
     constructor(
-        public message: string,
+        public message: ElementContent,
         public buttons: ButtonDef[],
         public visuals: VisualParamDef<DialogVisuals>,
     ) {

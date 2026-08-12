@@ -7,7 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-08-12
+
 ### Added
+- **`ElementContent` type** (`src/Utils/types.ts`) - Shared content shape accepted by dialog/flash messages and buttons: plain string, `{ html }`, or `{ component, componentProps }`
+- **`DynamicContent.vue`** - Renders an `ElementContent` value as text, raw HTML, or a dynamic component; used internally by `DialogBox.vue` and `FlashMessage.vue`
+- **`useFlash()` composable** (`src/Composables/flash.ts`) - Replaces the old `flash` singleton
+  - `addFlash(message, type, timeout, visuals)` pushes a new flash message and returns a `FlashApi`
+  - `FlashApi` — per-message instance with `id`, `message`, `type`, `timeout`, `visuals`, and `remove()`
+  - `FlashContainerData` — reactive `messages` list, optionally passed into `FlashContainer.vue` via `flashContainerData` prop
+  - `defaultFlashVisuals` gains a `closeBtnText` slot (defaults to `×`)
 - **`VisualParam` utility** (`src/Utils/VisualParam.ts`) - Cascading visual/CSS class configuration system
   - `VisualParam<T>` class resolves CSS classes from a priority-ordered list of `VisualParamDef` objects
   - `get(key)` returns the first defined value, `getAll()` merges all defs into one flat object
@@ -22,13 +31,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Flash components** — migrated to TypeScript (`<script setup lang="ts">`) and switched to `VisualParam`-based styling
-  - `FlashContainer.vue` — accepts a `visual?: VisualParamDef<FlashVisuals>` prop; resolves classes via `VisualParam` with `defaultFlashVisuals` as fallback
-  - `FlashMessage.vue` — accepts a `visuals?` prop forwarded from `FlashContainer`; close button class is now configurable via `closeBtnClass` visual
-  - `defaultFlashVisuals` exported from `flash.ts` — defines default Bootstrap-compatible classes (`alert`, `alert-*`, `flash-close-timer`, `btn-close`)
-- **`Flash` class** (`flash.ts`) — removed `messageCssClasses` and `containerCssClasses` instance methods; CSS logic moved into components via `VisualParam`
-- **`FlashVisuals`** type exported from `flash.ts` — `"containerClass" | "messageClass" | "messageTypePrefix" | "timerClass" | "closeBtnClass"`
+  - `FlashContainer.vue` — accepts a `visual?: VisualParamDef<FlashVisuals>` prop and an optional `flashContainerData` prop; falls back to `useFlash()`'s shared instance when omitted
+  - `FlashMessage.vue` — now takes a single `data: FlashApi` prop instead of separate `message`/`type`/`id`/`timeout` props; renders its message via `DynamicContent`; close button class is now configurable via `closeBtnClass` visual and its label via `closeBtnText`
+  - `defaultFlashVisuals` exported from `Composables/flash.ts` (moved from `Utils/flash.ts`) — defines default Bootstrap-compatible classes (`alert`, `alert-*`, `flash-close-timer`, `btn-close`)
+- **`Flash` class and `Utils/flash.ts` removed** — replaced by the `useFlash()` composable and `FlashApi` class in `Composables/flash.ts`
+- **`FlashVisuals`** type exported from `Composables/flash.ts` — `"containerClass" | "itemClass" | "messageClass" | "messageTypePrefix" | "timerClass" | "closeBtnClass" | "closeBtnText"`
+- **`DialogApi.message` and `ButtonDef.label`** now accept `ElementContent` instead of a plain string; `ButtonDef.labelHtml` removed in favor of passing `{ html }` as the `label`
 - **`useUrlMirror()`** — `router` and `route` parameters are now optional; when omitted, they are resolved automatically via `useRouter()` / `useRoute()`
 - **`UrlValue`** type in `routerUtils.ts` is now exported
+- **Build config** — `tsconfig.json` switched from `NodeNext`/`NodeNext` to `ESNext`/`Bundler` module resolution; `build`/`watch` scripts no longer pass `--module nodenext`
 
 ### Fixed
 - **`useIdGen`** — corrected async `nextTick()` call (added missing `await`); updated return type to include `Promise<string>`

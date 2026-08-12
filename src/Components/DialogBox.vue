@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {DialogApi, dialogDefaultVisual, DialogVisuals} from '../Composables/dialog';
-import {useTemplateRef, onMounted, unref, toRaw} from 'vue';
+import {useTemplateRef, onMounted, toRaw} from 'vue';
 import {VisualParam, VisualParamDef} from "../Utils/VisualParam.js";
+import DynamicContent from "./DynamicContent.vue";
 
 const props = defineProps<{
     data: DialogApi;
@@ -27,7 +28,7 @@ onMounted(() => {
             <span v-if="vis.closeButtonLabelHtml" v-html="vis.closeButtonLabelHtml" />
             <template v-else>{{ vis.closeButtonLabel }}</template>
         </button>
-        <div :class="vis.messageClass">{{ data.message }}</div>
+        <div :class="vis.messageClass"><DynamicContent :content="data.message" /></div>
         <div :class="vis.buttonContainerClass">
             <button
                 v-for="button in data.buttons"
@@ -35,8 +36,7 @@ onMounted(() => {
                 :class="button.cssClass ?? vis.buttonClass"
                 @click="data.onClick(toRaw(button))"
             >
-                <span v-if="button.labelHtml" v-html="button.labelHtml" />
-                <template v-else>{{ button.label }}</template>
+                <DynamicContent v-if="button.label !== undefined" :content="button.label" />
             </button>
         </div>
     </dialog>

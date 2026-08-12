@@ -1,39 +1,27 @@
 <script setup lang="ts">
 import FlashMessage from "./FlashMessage.vue";
-import {flash, FlashVisuals, defaultFlashVisuals} from "../Utils/flash";
-import {VisualParam, VisualParamDef} from "../Utils/VisualParam.js";
-import {ref} from "vue";
+import { useFlash, type FlashContainerData, type FlashVisuals, defaultFlashVisuals } from "../Composables/flash.js";
+import { VisualParam, type VisualParamDef } from "../Utils/VisualParam.js";
 
 const props = defineProps<{
+	flashContainerData?: FlashContainerData;
 	visual?: VisualParamDef<FlashVisuals>;
 }>();
+
+const { flashContainerData } = useFlash();
 
 const visual = new VisualParam<FlashVisuals>();
 if (props.visual) visual.addParamDef(props.visual);
 visual.addParamDef(defaultFlashVisuals);
 const vis = visual.getAll();
-
-const messages = ref([]);
-let lastId = 0;
-const add = (type, message) => {
-	lastId++;
-	messages.value.push({ message, type, id: lastId });
-}
-const remove = (id) => {
-	messages.value = messages.value.filter(item => item.id !== id);
-}
-flash.registerAdd((type, message) => add(type, message));
 </script>
 
 <template>
 <div :class="vis.containerClass">
 	<FlashMessage
-		v-for="message in messages"
-		:id="message.id"
-		:message="message.message"
-		:type="message.type"
-		@remove="remove"
-		:key="message.id"
+		v-for="item in (props.flashContainerData ?? flashContainerData).messages.value"
+		:data="item"
+		:key="item.id"
 		:visuals="props.visual"
 	/>
 </div>
